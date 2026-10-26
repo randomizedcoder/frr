@@ -1118,6 +1118,16 @@ static uint64_t ieee_float_uint32_to_uint64(uint32_t u)
 		uint32_t d;
 	} f = {.d = u};
 
+	/*
+	 * The value comes from the wire; converting a float that is out of
+	 * range for uint64_t is undefined. NaN, zero and negative bandwidths
+	 * give 0 (NaN fails every comparison), and anything at or above 2^64,
+	 * including +inf, saturates.
+	 */
+	if (!(f.r > 0.0f))
+		return 0;
+	if (f.r >= 0x1p64f)
+		return UINT64_MAX;
 	return (uint64_t)f.r;
 }
 
@@ -1128,7 +1138,7 @@ static int ecommunity_lb_str(char *buf, size_t bufsz, const uint8_t *pnt,
 	as_t as;
 	uint32_t bw_tmp;
 	uint64_t bw;
-	char bps_buf[20] = {0};
+	char bps_buf[32] = {0};
 
 	as = (*pnt++ << 8);
 	as |= (*pnt++);
@@ -1158,7 +1168,7 @@ static int ipv6_ecommunity_lb_str(char *buf, size_t bufsz, const uint8_t *pnt,
 	int len = 0;
 	as_t as = 0;
 	uint64_t bw = 0;
-	char bps_buf[20] = { 0 };
+	char bps_buf[32] = { 0 };
 
 	if (length < IPV6_ECOMMUNITY_SIZE)
 		goto done;
