@@ -1119,10 +1119,8 @@ static uint64_t ieee_float_uint32_to_uint64(uint32_t u)
 	} f = {.d = u};
 
 	/*
-	 * The value comes from the wire; converting a float that is out of
-	 * range for uint64_t is undefined. NaN, zero and negative bandwidths
-	 * give 0 (NaN fails every comparison), and anything at or above 2^64,
-	 * including +inf, saturates.
+	 * Bound peer-supplied values before conversion: NaN and nonpositive
+	 * values map to zero; values >= 2^64 (including +inf) saturate.
 	 */
 	if (!(f.r > 0.0f))
 		return 0;

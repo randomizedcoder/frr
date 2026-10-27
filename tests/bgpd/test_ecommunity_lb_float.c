@@ -1,15 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * BGP link-bandwidth extended community with an IEEE-754 bandwidth.
- *
- * The bandwidth of the (non-extended) link-bandwidth community is a 32-bit
- * IEEE floating point number of bytes per second, taken as-is from a peer's
- * UPDATE. Converting it to uint64_t must be defined for every bit pattern:
- * NaN and negative values give 0, and values at or above 2^64 (including
- * +inf) saturate at UINT64_MAX. Both users are checked: the display string
- * and ecommunity_linkbw_present(), which feeds weighted ECMP. The last
- * row uses the extended (IPv6-address-specific, 64-bit integer) community,
- * which shares the display code.
+ * Check IEEE-754 link-bandwidth decoding and display at conversion boundaries.
+ * Also check extended link-bandwidth display at UINT64_MAX.
  *
  * Each case runs in a child process so that a sanitizer abort fails only
  * that case.
