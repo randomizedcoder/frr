@@ -4962,6 +4962,19 @@ static bool isis_router_cap_fad_fits(const struct isis_router_cap *router_cap,
 	return 2 + isis_router_cap_fad_sub_tlv_len(fad) <=
 	       UINT8_MAX - isis_router_cap_hdr_len(router_cap);
 }
+
+/*
+ * Whether a Flex-Algo definition can be encoded whatever else is configured,
+ * i.e. in a Router Capability TLV that also carries an IPv6 TE Router ID.
+ */
+bool isis_flex_algo_fad_fits(const struct flex_algo *fa)
+{
+	struct isis_router_cap_fad fad = { .fad = *fa };
+	struct isis_router_cap router_cap = {};
+
+	router_cap.te_router_id_ipv6.s6_addr[15] = 1;
+	return isis_router_cap_fad_fits(&router_cap, &fad);
+}
 #endif /* ifndef FABRICD */
 
 static size_t isis_router_cap_tlv_size(const struct isis_router_cap *router_cap)
