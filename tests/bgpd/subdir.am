@@ -147,3 +147,17 @@ tests_bgpd_test_unencodable_withdraw_CPPFLAGS = $(TESTS_CPPFLAGS)
 tests_bgpd_test_unencodable_withdraw_LDADD = $(BGP_TEST_LDADD)
 tests_bgpd_test_unencodable_withdraw_SOURCES = tests/bgpd/test_unencodable_withdraw.c
 EXTRA_DIST += tests/bgpd/test_unencodable_withdraw.py
+
+if BGPD
+if RPKI
+check_PROGRAMS += tests/bgpd/test_rpki_socket
+else
+PYTEST_IGNORE += --ignore=bgpd/test_rpki_socket.py
+endif
+endif
+tests_bgpd_test_rpki_socket_CFLAGS = $(TESTS_CFLAGS) $(RTRLIB_CFLAGS)
+tests_bgpd_test_rpki_socket_CPPFLAGS = $(TESTS_CPPFLAGS)
+tests_bgpd_test_rpki_socket_LDADD = $(BGP_TEST_LDADD) $(RTRLIB_LIBS)
+tests_bgpd_test_rpki_socket_SOURCES = tests/bgpd/test_rpki_socket.c
+$(tests_bgpd_test_rpki_socket_OBJECTS): bgpd/bgp_rpki_clippy.c
+EXTRA_DIST += tests/bgpd/test_rpki_socket.py
